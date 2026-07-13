@@ -53,6 +53,8 @@ def get_token() -> str:
         },
         timeout=30,
     )
+    if not resp.ok:
+        print(f"Token request failed ({resp.status_code}): {resp.text}")
     resp.raise_for_status()
     return resp.json()["access_token"]
 
