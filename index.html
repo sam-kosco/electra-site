@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Header</title>
+  <style>
+    /* Intentionally minimal - no design decisions made yet */
+    body { color: black; background-color: white; }
+    img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html">Home</a> |
+    <a href="gallery.html">Photo Gallery</a>
+  </nav>
+
+  <hr>
+
+  <h1>Website Header</h1>
+
+  <p>Enter description here:</p>
+  <ol>
+    <li>First Item</li>
+    <li>Second Item</li>
+    <li>Third Item</li>
+  </ol>
+
+  <!-- Populated by script.js from photos.json. Hidden if no photo exists. -->
+  <img id="home-pic" alt="" hidden>
+
+  <script src="script.js"></script>
+</body>
+</html>
