@@ -1,4 +1,9 @@
 {
-  "homePagePic": null,
-  "gallery": []
+  "homePagePic": "images/home/Home Page.jpg",
+  "gallery": [
+    "images/gallery/gal1.png",
+    "images/gallery/gal2.jpg",
+    "images/gallery/gal3.jpg",
+    "images/gallery/gal4.jpg"
+  ]
 }
