@@ -1,0 +1,45 @@
+name: Update Photos
+
+on:
+  # Fired by the Power Automate flow (HTTP POST to the repository dispatches endpoint)
+  repository_dispatch:
+    types: [update-photos]
+  # Manual trigger from the Actions tab, for testing
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-photos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Sync photos from SharePoint
+        env:
+          TENANT_ID: ${{ secrets.TENANT_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        run: python sync_photos.py
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add images/ photos.json
+          if git diff --cached --quiet; then
+            echo "No photo changes to commit."
+          else
+            git commit -m "Update photos from SharePoint"
+            git push
+          fi
