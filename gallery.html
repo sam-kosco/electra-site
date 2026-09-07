@@ -8,6 +8,56 @@
     /* Intentionally minimal - no design decisions made yet */
     body { color: black; background-color: white; }
     img { max-width: 100%; height: auto; }
+
+    /* Carousel: every photo rendered at the same height (~80% of the
+       window), with translucent prev/next arrows overlaid on the photo. */
+    #carousel { display: flex; justify-content: center; }
+
+    #carousel-frame { position: relative; display: inline-block; }
+
+    #carousel-img {
+      display: block;
+      height: 80vh;
+      width: auto;
+      /* Viewport-based cap (not %) so the shrink-to-fit frame stays
+         glued to the photo; ultra-wide photos letterbox via contain. */
+      max-width: calc(100vw - 32px);
+      object-fit: contain;
+    }
+
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.35);
+      color: #fff;
+      font-size: 1.8rem;
+      line-height: 1;
+      padding: 18px 12px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+    .carousel-arrow:hover,
+    .carousel-arrow:focus-visible { background: rgba(0, 0, 0, 0.65); }
+    #carousel-prev { left: 12px; }
+    #carousel-next { right: 12px; }
+
+    #carousel-counter {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.35);
+      color: #fff;
+      padding: 3px 12px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -23,12 +73,12 @@
 
   <!-- Carousel. Populated by script.js from photos.json. -->
   <div id="carousel" hidden>
-    <img id="carousel-img" alt="">
-    <p>
-      <button id="carousel-prev" type="button">&lt; Previous</button>
+    <div id="carousel-frame">
+      <img id="carousel-img" alt="">
+      <button id="carousel-prev" class="carousel-arrow" type="button" aria-label="Previous photo">&#10094;</button>
+      <button id="carousel-next" class="carousel-arrow" type="button" aria-label="Next photo">&#10095;</button>
       <span id="carousel-counter"></span>
-      <button id="carousel-next" type="button">Next &gt;</button>
-    </p>
+    </div>
   </div>
 
   <p id="carousel-empty" hidden>No photos available.</p>
