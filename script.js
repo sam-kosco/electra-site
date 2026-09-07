@@ -36,11 +36,9 @@
     const track = document.getElementById("carousel-track");
     const counter = document.getElementById("carousel-counter");
     const STAGE_RATIO = 5 / 3; // keep in sync with #carousel-stage CSS
-    let index = 0;
+    const count = photos.length;
 
-    // One slide per photo; sliding the track gives the horizontal
-    // transition between photos.
-    for (const src of photos) {
+    function makeSlide(src) {
       const slide = document.createElement("div");
       slide.className = "carousel-slide";
       const img = document.createElement("img");
@@ -53,21 +51,52 @@
       };
       img.src = src;
       slide.appendChild(img);
-      track.appendChild(slide);
+      return slide;
     }
 
-    function show(i) {
-      index = (i + photos.length) % photos.length; // wrap around
-      track.style.transform = "translateX(" + (-index * 100) + "%)";
-      counter.textContent = " " + (index + 1) + " of " + photos.length + " ";
+    // Circular wrap: a clone of the last photo sits before the first,
+    // and a clone of the first sits after the last. Track positions run
+    // 0..count+1 with real photo i at position i+1. Wrapping slides onto
+    // a clone in the clicked direction, then invisibly snaps to the
+    // matching real slide once the animation ends.
+    track.appendChild(makeSlide(photos[count - 1]));
+    for (const src of photos) track.appendChild(makeSlide(src));
+    track.appendChild(makeSlide(photos[0]));
+
+    let pos = 1;
+
+    function place() {
+      track.style.transform = "translateX(" + (-pos * 100) + "%)";
+      const shown = ((pos - 1) % count + count) % count;
+      counter.textContent = " " + (shown + 1) + " of " + count + " ";
     }
+
+    function jump(p) { // reposition without animating
+      track.style.transition = "none";
+      pos = p;
+      place();
+      track.offsetHeight; // flush layout so the next move transitions
+      track.style.transition = "";
+    }
+
+    function normalize() { // resting on a clone? snap to its real slide
+      if (pos === count + 1) jump(1);
+      else if (pos === 0) jump(count);
+    }
+
+    // Snap as soon as the wrap animation finishes; the click handlers
+    // also normalize first, covering rapid clicks and reduced-motion
+    // (where no transitionend ever fires).
+    track.addEventListener("transitionend", (e) => {
+      if (e.target === track) normalize();
+    });
 
     document.getElementById("carousel-prev")
-      .addEventListener("click", () => show(index - 1));
+      .addEventListener("click", () => { normalize(); pos -= 1; place(); });
     document.getElementById("carousel-next")
-      .addEventListener("click", () => show(index + 1));
+      .addEventListener("click", () => { normalize(); pos += 1; place(); });
 
     carousel.hidden = false;
-    show(0);
+    jump(1);
   }
 })();
