@@ -33,13 +33,32 @@
       return;
     }
 
-    const img = document.getElementById("carousel-img");
+    const track = document.getElementById("carousel-track");
     const counter = document.getElementById("carousel-counter");
+    const STAGE_RATIO = 5 / 3; // keep in sync with #carousel-stage CSS
     let index = 0;
+
+    // One slide per photo; sliding the track gives the horizontal
+    // transition between photos.
+    for (const src of photos) {
+      const slide = document.createElement("div");
+      slide.className = "carousel-slide";
+      const img = document.createElement("img");
+      img.alt = "";
+      img.onload = () => {
+        // Photos wider than the stage get cropped to fill it exactly
+        if (img.naturalWidth / img.naturalHeight > STAGE_RATIO) {
+          img.classList.add("crop");
+        }
+      };
+      img.src = src;
+      slide.appendChild(img);
+      track.appendChild(slide);
+    }
 
     function show(i) {
       index = (i + photos.length) % photos.length; // wrap around
-      img.src = photos[index];
+      track.style.transform = "translateX(" + (-index * 100) + "%)";
       counter.textContent = " " + (index + 1) + " of " + photos.length + " ";
     }
 

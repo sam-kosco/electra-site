@@ -9,20 +9,46 @@
     body { color: black; background-color: white; }
     img { max-width: 100%; height: auto; }
 
-    /* Carousel: every photo rendered at the same height (~80% of the
-       window), with translucent prev/next arrows overlaid on the photo. */
+    /* Carousel: photos sit on a shaded 5:3 stage (~80% of the window
+       tall) with the arrows pinned to the stage edges. Photos wider
+       than 5:3 are cropped to fill the stage exactly; taller photos
+       show at full height with the shading visible on either side.
+       Photo changes slide horizontally along a track. */
     #carousel { display: flex; justify-content: center; }
 
-    #carousel-frame { position: relative; display: inline-block; }
+    #carousel-stage {
+      position: relative;
+      width: min(calc(80vh * 5 / 3), calc(100vw - 32px));
+      aspect-ratio: 5 / 3;
+      background: #e3e3e3;
+      border-radius: 8px;
+      /* clip, not hidden: a hidden box can still be scrolled by
+         focus/find-in-page scroll-into-view, silently misaligning the
+         transform-based track; clip makes the stage unscrollable. */
+      overflow: hidden;   /* fallback for browsers without clip */
+      overflow: clip;
+    }
 
-    #carousel-img {
-      display: block;
-      height: 80vh;
-      width: auto;
-      /* Viewport-based cap (not %) so the shrink-to-fit frame stays
-         glued to the photo; ultra-wide photos letterbox via contain. */
-      max-width: calc(100vw - 32px);
-      object-fit: contain;
+    #carousel-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.45s ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #carousel-track { transition: none; }
+    }
+
+    .carousel-slide {
+      flex: 0 0 100%;
+      height: 100%;
+    }
+    .carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;  /* taller than 5:3: full height, shaded sides */
+    }
+    .carousel-slide img.crop {
+      object-fit: cover;    /* wider than 5:3: crop sides to fill the stage */
     }
 
     .carousel-arrow {
@@ -71,10 +97,10 @@
 
   <h1>Photo Gallery</h1>
 
-  <!-- Carousel. Populated by script.js from photos.json. -->
+  <!-- Carousel. Slides are built by script.js from photos.json. -->
   <div id="carousel" hidden>
-    <div id="carousel-frame">
-      <img id="carousel-img" alt="">
+    <div id="carousel-stage">
+      <div id="carousel-track"></div>
       <button id="carousel-prev" class="carousel-arrow" type="button" aria-label="Previous photo">&#10094;</button>
       <button id="carousel-next" class="carousel-arrow" type="button" aria-label="Next photo">&#10095;</button>
       <span id="carousel-counter"></span>
