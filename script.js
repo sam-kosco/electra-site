@@ -99,4 +99,18 @@
     carousel.hidden = false;
     jump(1);
   }
+
+  // ---- Warm every site photo ----
+  // Whichever page is opened first fetches all photos (home + gallery),
+  // so the other page's photos are already in the browser cache when
+  // the visitor navigates there. References are kept on window so the
+  // decoded images stay held for the life of the page.
+  const everyPhoto = [data.homePagePic]
+    .concat(Array.isArray(data.gallery) ? data.gallery : [])
+    .filter(Boolean);
+  window.warmPhotos = everyPhoto.map((src) => {
+    const img = new Image();
+    img.src = src;
+    return img;
+  });
 })();
